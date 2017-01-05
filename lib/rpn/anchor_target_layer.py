@@ -12,6 +12,7 @@ from fast_rcnn.config import cfg
 import numpy as np
 import numpy.random as npr
 from generate_anchors import generate_anchors
+from generate_anchors import generate_anchors_from_layer
 from utils.cython_bbox import bbox_overlaps
 from fast_rcnn.bbox_transform import bbox_transform
 
@@ -25,10 +26,10 @@ class AnchorTargetLayer(caffe.Layer):
 
     def setup(self, bottom, top):
         layer_params = yaml.load(self.param_str_)
-        anchor_scales = layer_params.get('scales', (8, 16, 32))
-        self._anchors = generate_anchors(scales=np.array(anchor_scales))
-        self._num_anchors = self._anchors.shape[0]
         self._feat_stride = layer_params['feat_stride']
+
+        self._anchors = generate_anchors_from_layer(layer_params) #generate_anchors()
+        self._num_anchors = self._anchors.shape[0]
 
         if DEBUG:
             print 'anchors:'
@@ -81,13 +82,13 @@ class AnchorTargetLayer(caffe.Layer):
         # im_info
         im_info = bottom[2].data[0, :]
 
-        if DEBUG:
+        if 0 and DEBUG:
             print ''
             print 'im_size: ({}, {})'.format(im_info[0], im_info[1])
             print 'scale: {}'.format(im_info[2])
             print 'height, width: ({}, {})'.format(height, width)
-            print 'rpn: gt_boxes.shape', gt_boxes.shape
-            print 'rpn: gt_boxes', gt_boxes
+            #print 'rpn: gt_boxes.shape', gt_boxes.shape
+            #print 'rpn: gt_boxes', gt_boxes
 
         # 1. Generate proposals from bbox deltas and shifted anchors
         shift_x = np.arange(0, width) * self._feat_stride

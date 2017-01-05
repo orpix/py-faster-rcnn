@@ -34,6 +34,22 @@ import numpy as np
 #       [ -79., -167.,   96.,  184.],
 #       [-167., -343.,  184.,  360.]])
 
+def generate_anchors_from_layer(layer_params):
+
+    anchor_scales = np.array(layer_params.get('anchor_scales', 2**np.arange(3, 6)))
+    
+    anchor_ratios = layer_params.get('anchor_ratios', [0.5, 1, 2])
+    
+    anchor_base_size = layer_params.get('anchor_base_size', 16)
+    
+    anchors = generate_anchors(anchor_base_size, anchor_ratios, anchor_scales)
+
+    #anchor_data = {"scales": str(anchor_scales), "ratios": str(anchor_ratios), "base": anchor_base_size}
+    #import json
+    #json.dump(anchor_data, open("/orpix/cluster_root/domains/region_licenseplate/anchors.json", 'w'))
+    
+    return anchors
+    
 def generate_anchors(base_size=16, ratios=[0.5, 1, 2],
                      scales=2**np.arange(3, 6)):
     """

@@ -10,6 +10,7 @@ import numpy as np
 import yaml
 from fast_rcnn.config import cfg
 from generate_anchors import generate_anchors
+from generate_anchors import generate_anchors_from_layer
 from fast_rcnn.bbox_transform import bbox_transform_inv, clip_boxes
 from fast_rcnn.nms_wrapper import nms
 
@@ -26,8 +27,8 @@ class ProposalLayer(caffe.Layer):
         layer_params = yaml.load(self.param_str_)
 
         self._feat_stride = layer_params['feat_stride']
-        anchor_scales = layer_params.get('scales', (8, 16, 32))
-        self._anchors = generate_anchors(scales=np.array(anchor_scales))
+        self._anchors     = generate_anchors_from_layer(layer_params) #generate_anchors()
+        
         self._num_anchors = self._anchors.shape[0]
 
         if DEBUG:
