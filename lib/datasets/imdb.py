@@ -76,7 +76,7 @@ class imdb(object):
 
     @property
     def num_images(self):
-      return len(self.image_index)
+        return len(self.image_index)
 
     def image_path_at(self, i):
         raise NotImplementedError
@@ -114,6 +114,25 @@ class imdb(object):
                      'flipped' : True}
             self.roidb.append(entry)
         self._image_index = self._image_index * 2
+        
+        
+    def ensure_roidb_is_even(self):
+        
+        num_images = self.num_images
+        
+        if not num_images%2 == 0:
+            
+            boxes = self.roidb[0]['boxes'].copy()
+            
+            entry = {'boxes' : boxes,
+                     'gt_overlaps' : self.roidb[0]['gt_overlaps'],
+                     'gt_classes' : self.roidb[0]['gt_classes'],
+                     'flipped' : False}
+            
+            self.roidb.append(entry)
+            self._image_index = self._image_index + [self._image_index[0]]
+            return
+        
 
     def evaluate_recall(self, candidate_boxes=None, ar_thresh=0.5):
         # Record max overlap value for each gt box
