@@ -4,7 +4,6 @@
 # Licensed under The MIT License [see LICENSE for details]
 # Written by Ross Girshick
 # --------------------------------------------------------
-
 import numpy as np
 
 def bbox_transform(ex_rois, gt_rois):
@@ -47,6 +46,11 @@ def bbox_transform_inv(boxes, deltas):
     pred_ctr_y = dy * heights[:, np.newaxis] + ctr_y[:, np.newaxis]
     pred_w = np.exp(dw) * widths[:, np.newaxis]
     pred_h = np.exp(dh) * heights[:, np.newaxis]
+    
+    nansum1 = np.sum(np.isnan(pred_w))
+    nansum2 = np.sum(np.isnan(pred_h))
+    if nansum1 > 0 or nansum2 > 0:
+        raise Exception("Nan values detected in rpn")
 
     pred_boxes = np.zeros(deltas.shape, dtype=deltas.dtype)
     # x1
